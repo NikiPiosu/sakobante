@@ -120,6 +120,14 @@ namespace sakobante
                             timer.Start();
                             MapPrint(map);
                         }
+                        else
+                        {
+                            m=0;
+                            map = level[m];
+                            M = 0;
+                            timer.Start();
+                            MapPrint(map);
+                        }
                         break;
                     case ConsoleKey.R:
                         LEVEL[m].CopyTo(level[m], 0);
