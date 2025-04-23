@@ -13,7 +13,9 @@ namespace sakobante
     {
         static void Main(string[] args)
         {
+            //элементы уровня
             int w = 1; int b = 2; int x = 3; int p = 4;
+            //уровни
             int[][] level = new int[][]
             {new int[]{
              w,w,w,
@@ -59,8 +61,10 @@ namespace sakobante
                 LEVEL[i] = new int[level[i].Length];
                 level[i].CopyTo(LEVEL[i], 0);
             }
+            //первая вырисовка карты
             int[] map = level[0];
             MapPrint(map);
+            //таймер
             System.Timers.Timer timer = new System.Timers.Timer(1000);
             timer.Elapsed += (s, e) =>
             {
@@ -76,9 +80,11 @@ namespace sakobante
                 Console.SetCursorPosition(0, Console.CursorTop);
                 Console.Write(m + ":" + sec);
             };
-            timer.Start();  
+            timer.Start();
+            //цикл работы 
             do
             {
+                //движение
                 ConsoleKey key;
                 key = Console.ReadKey().Key;
                 switch (key)
@@ -106,7 +112,7 @@ namespace sakobante
                         }
                         break;
                     case ConsoleKey.E:
-                        if (m != 3)
+                        if (m != level.Length-1)
                         {
                             m++;
                             map = level[m];
@@ -124,12 +130,14 @@ namespace sakobante
                         GameOn = false;
                         break;
                 }
+                //условия таймера
                 if (Win(map)) { timer.Stop(); };
                 if (Win(map)==false) { timer.Start(); };
 
 
             } while (GameOn);
         }
+        //отрисовка карты
         public static void MapPrint(int[] map)
         {
             Console.Clear();
@@ -185,6 +193,7 @@ namespace sakobante
             Console.Write(m+":"+s);
 
         }
+        //функция движения
         public static void Move(int x, int[] map)
         {
             bool win = false;
@@ -245,6 +254,7 @@ namespace sakobante
             MapPrint(map);
             if (win) { Console.WriteLine("Победа"); }
         }
+        //определение победы
         public static bool Win(int[] map)
         {
             for (int i = 0; i < map.Length - 2; i++)
