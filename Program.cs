@@ -52,6 +52,7 @@ namespace sakobante
              0,0,8,28
              }
             };
+            //переменные
             bool GameOn = true;
             int m = 0;
             int[][] LEVEL = new int[level.Length][];
@@ -71,6 +72,7 @@ namespace sakobante
                 int sec; int m;
                 m = map[^4] / 60;
                 sec = map[^4] - m * 60;
+                //вывод таймера
                 Console.SetCursorPosition(0, ((map.Length - 4) / map[^2]) + 1);
                 if (sec == 0)
                 {
@@ -89,6 +91,7 @@ namespace sakobante
                 key = Console.ReadKey().Key;
                 switch (key)
                 {
+                    //кнопки движения
                     case ConsoleKey.UpArrow:
                     case ConsoleKey.W:
                         Move(-map[^2], map);
@@ -105,6 +108,7 @@ namespace sakobante
                     case ConsoleKey.A:
                         Move(-1, map);
                         break;
+                        //переключает уровень
                     case ConsoleKey.Q:
                         if (m != 0)
                         {
@@ -130,11 +134,13 @@ namespace sakobante
                             MapPrint(map);
                         }
                         break;
+                        //перезапуск уровня
                     case ConsoleKey.R:
                         LEVEL[m].CopyTo(level[m], 0);
                         level[m].CopyTo(map, 0);
                         MapPrint(map);
                         break;
+                        //вызывает меню помощи
                     case ConsoleKey.H:
                         StartPrint(map);
                         break;
@@ -160,8 +166,10 @@ namespace sakobante
             Console.Clear();
             for (int i = 0; i < map.Length - 4; i = i + map[^2])
             {
+                //цикл для вывода всего поля
                 for (int j = i; j < i + map[^2]; j++)
                 {
+                    //условие для вывода определённой клетки
                     switch (map[j])
                     {
                         case 0:
@@ -199,12 +207,15 @@ namespace sakobante
                 }
                 Console.Write('\n');
             }
+            //вывод движений
             Console.WriteLine("движения: " + map[^3]);
             Console.SetCursorPosition(0, Console.CursorTop);
-            int s; int m;
-            m = map[^4] / 60;
-            s = map[^4] - m * 60;
+            //переменные времени (сек/мин)
+            int m = map[^4] / 60;
+            int s = map[^4] - m * 60;
+            //вывод времени
             Console.Write(m + ":" + s);
+            //вывод победы
             if (Win(map) == true)
             {
                 Console.WriteLine("\nПобеда");
@@ -217,14 +228,17 @@ namespace sakobante
             bool Box = false;
             bool win = false;
             int y = map[^1] + x;
+            //движение персонажа в сторону x 
             switch (map[y])
             {
+                //если пусто
                 case 0:
                     map[y] = 4;
                     map[map[^1]] = map[map[^1]] - 4;
                     map[^1] = map[^1] + x;
                     map[^3]++;
                     break;
+                //если коробка
                 case 2:
                     switch (map[y + x])
                     {
@@ -246,12 +260,14 @@ namespace sakobante
                             break;
                     }
                     break;
+                    //если цель
                 case 3:
                     map[y] = map[y] + 4;
                     map[y - x] = map[y - x] - 4;
                     map[^1] = map[^1] + x;
                     map[^3]++;
                     break;
+                    //если коробка на цели
                 case 5:
                     switch (map[y + x])
                     {
@@ -327,6 +343,7 @@ namespace sakobante
         //прорисовка движения
         public static void MovePrint(int[] map, int b, bool Box)
         {
+            //изменение позиции персонажа на экране
             Console.SetCursorPosition((map[^1] % map[^2]) + (map[^1] % map[^2]) - 1, map[^1] / map[^2]);
             switch (map[map[^1]])
             {
@@ -341,6 +358,7 @@ namespace sakobante
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
             }
+            //изменение позиции где персонаж был до хода
             Console.SetCursorPosition(((map[^1] - b) % map[^2]) + ((map[^1] - b) % map[^2]) - 1, (map[^1] - b) / map[^2]);
             switch (map[map[^1] - b])
             {
@@ -353,6 +371,7 @@ namespace sakobante
                     Console.ForegroundColor = ConsoleColor.White;
                     break;
             }
+            //изменение позиции перед персонажем (если сдвинута коробка)
             if (Box)
             {
                 Console.SetCursorPosition(((map[^1] + b) % map[^2]) + ((map[^1] + b) % map[^2]) - 1, (map[^1] + b) / map[^2]);
@@ -370,6 +389,7 @@ namespace sakobante
                         break;
                 }
             }
+            //вывод ходов
             Console.SetCursorPosition(10, ((map.Length - 4) / map[^2]));
             Console.Write(map[^3]);
             Console.SetCursorPosition(0, ((map.Length - 4) / map[^2]+3));
