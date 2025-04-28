@@ -51,19 +51,18 @@ namespace sakobante
              0,0,w,w,w,0,0,0,
              0,0,8,28
              }
-            }; 
-            bool GameOn=true;
-            int M = 0;
+            };
+            bool GameOn = true;
             int m = 0;
             int[][] LEVEL = new int[level.Length][];
+            ConsoleKey key;
+            int[] map = level[0];
+            StartPrint(map);
             for (int i = 0; i < level.Length; i++)
             {
                 LEVEL[i] = new int[level[i].Length];
                 level[i].CopyTo(LEVEL[i], 0);
             }
-            //первая вырисовка карты
-            int[] map = level[0];
-            MapPrint(map);
             //таймер
             System.Timers.Timer timer = new System.Timers.Timer(1000);
             timer.Elapsed += (s, e) =>
@@ -72,33 +71,38 @@ namespace sakobante
                 int sec; int m;
                 m = map[^4] / 60;
                 sec = map[^4] - m * 60;
-                if ( sec == 0)
+                Console.SetCursorPosition(0, ((map.Length - 4) / map[^2]) + 1);
+                if (sec == 0)
                 {
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    Console.Write(m + ":" + sec+" ");
+                    Console.Write(m + ":" + sec + " ");
                 }
-                Console.SetCursorPosition(0, Console.CursorTop);
-                Console.Write(m + ":" + sec);
+                else
+                {
+                    Console.Write(m + ":" + sec);
+                }
             };
             timer.Start();
             //цикл работы 
             do
             {
                 //движение
-                ConsoleKey key;
                 key = Console.ReadKey().Key;
                 switch (key)
                 {
                     case ConsoleKey.UpArrow:
+                    case ConsoleKey.W:
                         Move(-map[^2], map);
                         break;
                     case ConsoleKey.DownArrow:
+                    case ConsoleKey.S:
                         Move(map[^2], map);
                         break;
                     case ConsoleKey.RightArrow:
+                    case ConsoleKey.D:
                         Move(1, map);
                         break;
                     case ConsoleKey.LeftArrow:
+                    case ConsoleKey.A:
                         Move(-1, map);
                         break;
                     case ConsoleKey.Q:
@@ -106,25 +110,22 @@ namespace sakobante
                         {
                             m--;
                             map = level[m];
-                            M = 0;
-                            timer.Start();   
+                            timer.Start();
                             MapPrint(map);
                         }
                         break;
                     case ConsoleKey.E:
-                        if (m != level.Length-1)
+                        if (m != level.Length - 1)
                         {
                             m++;
                             map = level[m];
-                            M = 0;
                             timer.Start();
                             MapPrint(map);
                         }
                         else
                         {
-                            m=0;
+                            m = 0;
                             map = level[m];
-                            M = 0;
                             timer.Start();
                             MapPrint(map);
                         }
@@ -134,13 +135,21 @@ namespace sakobante
                         level[m].CopyTo(map, 0);
                         MapPrint(map);
                         break;
+                    case ConsoleKey.H:
+                        StartPrint(map);
+                        break;
                     case ConsoleKey.Escape:
                         GameOn = false;
                         break;
                 }
                 //условия таймера
                 if (Win(map)) { timer.Stop(); };
-                if (Win(map)==false) { timer.Start(); };
+                if (Win(map)) 
+                {
+                    Console.SetCursorPosition(0, ((map.Length - 4) / map[^2]) + 2);
+                    Console.WriteLine("победа");
+                };
+                if (Win(map) == false) { timer.Start(); };
 
 
             } while (GameOn);
@@ -149,11 +158,12 @@ namespace sakobante
         public static void MapPrint(int[] map)
         {
             Console.Clear();
-            for (int i = 0; i < map.Length-4; i = i + map[^2])
+            for (int i = 0; i < map.Length - 4; i = i + map[^2])
             {
                 for (int j = i; j < i + map[^2]; j++)
                 {
-                    switch (map[j]){
+                    switch (map[j])
+                    {
                         case 0:
                             Console.Write(" " + " ");
                             break;
@@ -196,14 +206,15 @@ namespace sakobante
             Console.WriteLine("движения: " + map[^3]);
             Console.SetCursorPosition(0, Console.CursorTop);
             int s; int m;
-            m = map[^4]/60;
-            s = map[^4]-m*60;
-            Console.Write(m+":"+s);
+            m = map[^4] / 60;
+            s = map[^4] - m * 60;
+            Console.Write(m + ":" + s);
 
         }
         //функция движения
         public static void Move(int x, int[] map)
         {
+            bool Box = false;
             bool win = false;
             int y = map[^1] + x;
             switch (map[y])
@@ -223,13 +234,15 @@ namespace sakobante
                             map[map[^1]] = map[map[^1]] - 4;
                             map[^1] = map[^1] + x;
                             map[^3]++;
+                            Box = true;
                             break;
                         case 3:
                             map[y + x] = map[y + x] + 2;
-                            map[y] = map[y]+2;
+                            map[y] = map[y] + 2;
                             map[map[^1]] = map[map[^1]] - 4;
                             map[^1] = map[^1] + x;
                             map[^3]++;
+                            Box = true;
                             break;
                     }
                     break;
@@ -257,9 +270,9 @@ namespace sakobante
                             map[^3]++;
                             break;
                     }
-                    break;                  
+                    break;
             }
-            MapPrint(map);
+            MovePrint(map, x, Box);
             if (win) { Console.WriteLine("Победа"); }
         }
         //определение победы
@@ -273,6 +286,93 @@ namespace sakobante
                 }
             }
             return true;
+        }
+        //написание меню помощи
+        public static void StartPrint(int[] map)
+        {
+            Console.Clear();
+            Console.Write("управление: " +
+                "\n WASD или стрелочки - передвижение " +
+                "\n QE - переключение уровней " +
+                "\n R - перезапуск - уровня " +
+                "\n ESC - выход из игры " +
+                "\n H - для вызова этого меню" +
+                "\n нажмите любую клавишу для продолжения");
+            ConsoleKey key;
+            key = Console.ReadKey().Key;
+            Console.Clear();
+            Console.Write("объекты: " +
+                "\n # - стена \n");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write(" @" + " ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("- персонаж \n");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.Write(" B" + " ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("- коробка \n");
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.Write(" X" + " ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("- цель");
+            Console.Write("\n нажмите любую клавишу для продолжения");
+            key = Console.ReadKey().Key;
+            Console.Clear();
+            Console.Write("цель игры: " +
+                "\n передвинуть все коробки(B) на все цели(X)" +
+                "\n нажмите любую клавишу для продолжения");
+            key = Console.ReadKey().Key;
+            MapPrint(map);
+        }
+        //прорисовка движения
+        public static void MovePrint(int[] map, int b, bool Box)
+        {
+            Console.SetCursorPosition((map[^1] % map[^2]) + (map[^1] % map[^2]) - 1, map[^1] / map[^2]);
+            switch (map[map[^1]])
+            {
+               case 4:
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(" @");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+               case 7:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write(" @");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+            Console.SetCursorPosition(((map[^1] - b) % map[^2]) + ((map[^1] - b) % map[^2]) - 1, (map[^1] - b) / map[^2]);
+            switch (map[map[^1] - b])
+            {
+                case 0:
+                    Console.Write("  ");
+                    break;
+                case 3:
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.Write(" X");
+                    Console.ForegroundColor = ConsoleColor.White;
+                    break;
+            }
+            if (Box)
+            {
+                Console.SetCursorPosition(((map[^1] + b) % map[^2]) + ((map[^1] + b) % map[^2]) - 1, (map[^1] + b) / map[^2]);
+                switch ((map[map[^1] + b]))
+                {
+                    case 2:
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.Write(" B");
+                    Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                    case 5:
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.Write(" B");
+                        Console.ForegroundColor = ConsoleColor.White;
+                        break;
+                }
+            }
+            Console.SetCursorPosition(10, ((map.Length - 4) / map[^2]));
+            Console.Write(map[^3]);
+            Console.SetCursorPosition(0, ((map.Length - 4) / map[^2]+3));
         }
     }
 }
