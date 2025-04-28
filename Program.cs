@@ -199,16 +199,16 @@ namespace sakobante
                 }
                 Console.Write('\n');
             }
-            if (Win(map) == true)
-            {
-                Console.WriteLine("Победа");
-            }
             Console.WriteLine("движения: " + map[^3]);
             Console.SetCursorPosition(0, Console.CursorTop);
             int s; int m;
             m = map[^4] / 60;
             s = map[^4] - m * 60;
             Console.Write(m + ":" + s);
+            if (Win(map) == true)
+            {
+                Console.WriteLine("\nПобеда");
+            }
 
         }
         //функция движения
